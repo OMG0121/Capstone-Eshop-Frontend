@@ -1,0 +1,47 @@
+#logo {
+    margin-top: 10px;
+}
+
+#logo-name {
+    margin-left: 10px;
+}
+
+#search-bar {
+    margin-left: 150px;
+}
+
+
+.links {
+    color: white;
+    margin-left: 20px;
+}
+
+#login-btn {
+    margin-left: 700px;
+}
+
+#logout-btn {
+    background-color: rgb(255, 0, 106);
+    margin-left: 20px;
+}
+
+#login-modal, #register-modal {
+    text-align: center;
+}
+
+#lock-icon {
+    color: rgb(255, 0, 106);
+}
+
+#modal-login-btn, .login-modal-form, .register-modal-form, #modal-register-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#no-account-link, #account-link {
+    margin-top: 20px;
+}
+
+#copyright {
+    margin-top: 40px;
+}
