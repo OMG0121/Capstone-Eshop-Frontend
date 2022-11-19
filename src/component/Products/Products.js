@@ -15,6 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import { useNavigate } from 'react-router-dom';
 
 export default function Products(props) {
     const isLogin = sessionStorage.getItem("token")==null? false: true;
@@ -23,6 +24,7 @@ export default function Products(props) {
     const [categoriesData, setCategoriesData] = React.useState([]);
     const [tabCategory, setTabCategory] = React.useState('All');
     const [sort, setSort] = React.useState('');
+    const navigate = useNavigate();
 
     const selectHandleChange = (event) => {
         let newSort = event.target.value;
@@ -184,10 +186,16 @@ export default function Products(props) {
             xhrProduct.send();
         }
 
+
         setSort("default");
         setTabCategory(newCategory);
 
     };
+
+    function onCLickBuyHandler (id) {
+        console.log(id);
+        navigate(`/details?id=${id}`)
+    }
 
     React.useEffect(() => {
         let xhrCategory = new XMLHttpRequest();
@@ -291,10 +299,10 @@ export default function Products(props) {
                             <div>
                                 {
                                     role === "user" ?
-                                    <Button variant="contained" color="primary" id="buy-btn">Buy</Button> :
+                                    <Button variant="contained" color="primary" id="buy-btn" onClick={() => {onCLickBuyHandler(product._id)}}>Buy</Button> :
                                     <div id="btn-div">
                                         <div>
-                                            <Button variant="contained" color="primary" id="buy-btn">Buy</Button>
+                                            <Button variant="contained" color="primary" id="buy-btn" onClick={() => {onCLickBuyHandler(product._id)}}>Buy</Button>
                                         </div>
                                         <div>
                                             <EditIcon id="edit-btn"/> <DeleteIcon id="delete-btn"/>
