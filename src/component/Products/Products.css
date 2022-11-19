@@ -1,0 +1,30 @@
+#tabs-div {
+    text-align: center;
+    margin: 20px;
+}
+
+#sort-div {
+    width: 20%;
+    margin: 40px;
+}
+
+#card-main-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.products-cards {
+    margin: 20px;
+}
+
+
+#btn-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#buy-btn, #edit-btn, #delete-btn {
+    margin: 10px;
+}
