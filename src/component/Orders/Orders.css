@@ -1,0 +1,38 @@
+#stepper-div {
+    margin: 50px 80px;
+}
+
+#product-quantity-div {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+}
+
+.button-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#stepper-address-div {
+    margin: 20px;
+    text-align: center;
+}
+
+.stepper-form-control {
+    width: 40%;
+    margin-bottom: 10px;
+}
+
+#order-div {
+    display: flex;
+    flex-direction: row;
+    margin: 20px;
+}
+
+#order-products-div {
+    width: 60%;
+}
+#orders-address-div {
+    width: 40%;
+}
