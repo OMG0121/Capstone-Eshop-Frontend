@@ -9,6 +9,13 @@ import Modal from 'react-modal';
 import { InputLabel, FormControl, Input} from '@material-ui/core';
 import LockIcon from '@mui/icons-material/Lock';
 import CopyrightIcon from '@mui/icons-material/Copyright';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import { TextField} from '@mui/material';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -68,7 +75,23 @@ export default function Header(props) {
     const [registerModal, setRegisterModal] = React.useState(props.regitersModal)
     const [isLogin, setLogin] = React.useState(sessionStorage.getItem("token") == null ? false : true)
     const [role, setRole] = React.useState(sessionStorage.getItem("role"));
+    const [open, setOpen] = React.useState(false);
+    const [snackSverity, setSnackSeverity] = React.useState("success");
+    const [snackMessage, setSnackMessage] = React.useState("Addresss Added");
+    const [addProductModal, setAddProductModal] = React.useState(false);
     const navigate = useNavigate();
+
+    const handleSnackClick = () => {
+        setOpen(true);
+    };
+
+    const handleSnackClose = (event, reason) => {
+        if (reason === 'clickaway') {
+        return;
+        }
+
+        setOpen(false);
+    };
 
     function openLoginModal() {
         setLoginModal(true);
@@ -88,6 +111,14 @@ export default function Header(props) {
         navigate('/');
     }
 
+    function openProductModal() {
+        setAddProductModal(true);
+    }
+
+    function closeProductModal() {
+        setAddProductModal(false);
+    }
+
     function onClickNoAccount() {
         closeLoginModal();
         openRegisterModal();
@@ -102,13 +133,10 @@ export default function Header(props) {
         let email = document.getElementById("modal-login-email").value;
         let password = document.getElementById("modal-login-password").value;
 
-        console.log(email, password);
-
         let xhr = new XMLHttpRequest();
 
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-                console.log(this.responseText);
                 let data = JSON.parse(this.responseText);
                 if (data.isAuthenticated === true) {
                     sessionStorage.setItem("token", data.token);
@@ -135,8 +163,6 @@ export default function Header(props) {
 
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-                console.log(this.responseText);
-
                 let data = JSON.parse(this.responseText);
 
                 if (data.isAuthenticated === false) {
@@ -164,8 +190,6 @@ export default function Header(props) {
         let contactNumber = document.getElementById("modal-register-contact-number").value;
         let password = document.getElementById("modal-register-confirm-password").value;
 
-        console.log(firstName, lastName, email, contactNumber, password);
-
         let xhr = new XMLHttpRequest();
 
         let dataSignup = JSON.stringify({
@@ -178,8 +202,6 @@ export default function Header(props) {
 
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-                console.log(this.responseText);
-
                 let data = JSON.parse(this.responseText);
 
                 if (data.status === "Try any other email, this email is already registered!") {
@@ -204,11 +226,12 @@ export default function Header(props) {
         xhr.setRequestHeader("Cache-Control", "no-cache");
 
         xhr.send(dataSignup);
+
+
     }
 
     function onChangeSearchBar(e) {
         let name = e.target.value;
-        console.log(name);
         
         if (props.setProductsData === undefined) {
             return;
@@ -220,8 +243,6 @@ export default function Header(props) {
 
             xhr.addEventListener("readystatechange", function() {
                 if (this.readyState === 4) {
-                    console.log(this.responseText);
-
                     let data = JSON.parse(this.responseText);
 
                     props.setProductsData(data);
@@ -241,8 +262,6 @@ export default function Header(props) {
 
             xhr.addEventListener("readystatechange", function() {
                 if (this.readyState === 4) {
-                    console.log(this.responseText);
-
                     let data = JSON.parse(this.responseText);
 
                     props.setProductsData(data);
@@ -256,6 +275,60 @@ export default function Header(props) {
             xhr.send();
         }
         
+    }
+
+    function onClickProductModal() {
+        let name = document.getElementById("product-name").value;
+        let category = document.getElementById("product-category").value;
+        let manufacturer = document.getElementById("product-manufacturer").value;
+        let available = document.getElementById("product-available").value;
+        let price = document.getElementById("product-price").value;
+        let image = document.getElementById("product-image").value;
+        let description = document.getElementById("product-description").value;
+
+        if (name === "" || category === "" || manufacturer === "" || available === "" || price === "" || image === "" || description === "") {
+            alert("Please enter all the field");
+            return;
+        }
+
+        let xhr = new XMLHttpRequest();
+
+        let productsObj = JSON.stringify({
+            "name": name,
+            "availableItems": available,
+            "price": price,
+            "category": category,
+            "description": description,
+            "imageURL": image,
+            "manufacturer": manufacturer
+        })
+
+        xhr.addEventListener("readystatechange", function() {
+            if (this.readyState === 4) {
+                let responseObj = JSON.parse(this.responseText);
+
+                if (responseObj.status === "success") {
+                    setSnackSeverity("success");
+                    setSnackMessage(`Product ${name} Added Successfully`);
+                    handleSnackClick();
+                    closeProductModal();
+                    alert(`Product ${name} Added Successfully`)
+                    navigate('/');
+                    navigate('/products');
+                }
+                else {
+                    alert("Invalid Product Details!")
+                }
+            }
+        });
+
+        xhr.open("POST", props.baseURL + `products`);
+
+        xhr.setRequestHeader("x-access-token", sessionStorage.getItem("token"));
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+
+        xhr.send(productsObj);
     }
 
     return (
@@ -317,7 +390,7 @@ export default function Header(props) {
                     component="div"
                     sx={{ display: { xs: 'none', sm: 'block' } }}
                 >
-                    <Link to="/" className="links">Add Product</Link>
+                    <span id="add-product-span" onClick={openProductModal}>Add Product</span>
                 </Typography> :
                 ""
             }
@@ -365,7 +438,7 @@ export default function Header(props) {
                 isOpen={loginModal}
                 onRequestClose={closeLoginModal}
                 style={customStyles}
-                contentLabel="Example Modal"
+                contentLabel="Login Modal"
                 id="login-modal"
             >
 
@@ -426,7 +499,7 @@ export default function Header(props) {
                 isOpen={registerModal}
                 onRequestClose={closeRegisterModal}
                 style={customStyles}
-                contentLabel="Example Modal"
+                contentLabel="Register Modal"
                 id="register-modal"
             >
 
@@ -499,10 +572,67 @@ export default function Header(props) {
                 >
                     <CopyrightIcon/> upGrad 2022
                 </Typography>
+
+
+            </Modal>
+
+            <Modal
+                isOpen={addProductModal}
+                onRequestClose={closeProductModal}
+                style={customStyles}
+                contentLabel="Product Modal"
+                id="product-modal"
+            >
+
+                <Typography
+                    variant="h5"
+                    noWrap
+                    component="div"
+                    sx={{ display: { xs: 'none', sm: 'block' } }}
+                >
+                    Add Product
+                </Typography>
+
+                <FormControl required={true} className="add-product-modal-form">
+                    <TextField id="product-name" label="Name" variant="outlined" type="text"/>
+                </FormControl> <br/> <br/>
+
+                <FormControl required={true} className="add-product-modal-form">
+                    <TextField id="product-category" label="Category" variant="outlined" type="text"/>
+                </FormControl> <br/> <br/>
+
+                <FormControl required={true} className="add-product-modal-form">
+                    <TextField id="product-manufacturer" label="Manufacturer" variant="outlined" type="text"/>
+                </FormControl> <br/> <br/>
+
+                <FormControl required={true} className="add-product-modal-form">
+                    <TextField id="product-available" label="Available Items" variant="outlined" type="number"/>
+                </FormControl> <br/> <br/>
+
+                <FormControl required={true} className="add-product-modal-form">
+                    <TextField id="product-price" label="Price" variant="outlined" type="number"/>
+                </FormControl> <br/> <br/>
+
+                <FormControl required={true} className="add-product-modal-form">
+                    <TextField id="product-image" label="Image URL" variant="outlined" type="text"/>
+                </FormControl> <br/> <br/>
+
+                <FormControl required={true} className="add-product-modal-form">
+                    <TextField id="product-description" label="Product Description" variant="outlined" type="text"/>
+                </FormControl> <br/> <br/>
+
+                <Button variant="contained" color="primary" id="modal-product-btn" onClick={onClickProductModal}>Save Product</Button>
+
             </Modal>
             
             </Toolbar>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleSnackClose}>
+                <Alert onClose={handleSnackClose} severity={snackSverity} sx={{ width: '100%' }}>
+                    {snackMessage}
+                </Alert>
+            </Snackbar>
         </AppBar>
         </Box>
   );
+  
 }

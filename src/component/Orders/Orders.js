@@ -22,7 +22,6 @@ export default function Orders(props) {
     const search = useLocation().search;
     const id = new URLSearchParams(search).get('id');
     const quantity = new URLSearchParams(search).get('quantity');
-    console.log(id, quantity);
     const steps = ['Items', 'Select Address', 'Confirm Order'];
     const [activeStep, setActiveStep] = React.useState(0);
     const [productsData, setProductsData] = React.useState([]);
@@ -72,7 +71,6 @@ export default function Orders(props) {
 
             xhr.addEventListener("readystatechange", function() {
                 if (this.readyState === 4) {
-                    console.log(this.responseText);
 
                     let responseObj = JSON.parse(this.responseText);
 
@@ -110,7 +108,6 @@ export default function Orders(props) {
 
         xhrProduct.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-                console.log(this.responseText);
 
                 let data = JSON.parse(this.responseText);
 
@@ -133,8 +130,6 @@ export default function Orders(props) {
         let landmark = document.getElementById("address-landmark").value;
         let zip = document.getElementById("address-zip").value;
 
-        console.log(name, contact, street, city, state, landmark, zip);
-
         if (name === "" || contact === "" || street === "" || city === "" || city === "" || state === "" || landmark === "" || zip === "") {
             alert("Please enter all the fields");
             return;
@@ -154,7 +149,6 @@ export default function Orders(props) {
 
         xhr.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-                console.log(this.responseText);
 
                 let responseObj = JSON.parse(this.responseText);
 
@@ -176,6 +170,7 @@ export default function Orders(props) {
         xhr.setRequestHeader("Cache-Control", "no-cache");
 
         xhr.send(addressData);
+
     }
 
     return (
@@ -455,4 +450,6 @@ export default function Orders(props) {
             }
         </div>
     );
+    
 }
+

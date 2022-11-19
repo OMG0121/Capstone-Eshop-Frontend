@@ -16,6 +16,27 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { useNavigate } from 'react-router-dom';
+import Modal from 'react-modal';
+import { TextField} from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+    },
+};
+
+Modal.setAppElement(document.getElementById('root'));
 
 export default function Products(props) {
     const isLogin = sessionStorage.getItem("token")==null? false: true;
@@ -24,7 +45,44 @@ export default function Products(props) {
     const [categoriesData, setCategoriesData] = React.useState([]);
     const [tabCategory, setTabCategory] = React.useState('All');
     const [sort, setSort] = React.useState('');
+    const [addProductModal, setAddProductModal] = React.useState(false);
+    const [deleteProductModal, setDeleteProductModal] = React.useState(false);
+    const [id, setId] = React.useState("");
+    const [open, setOpen] = React.useState(false);
+    const [snackSverity, setSnackSeverity] = React.useState("success");
+    const [snackMessage, setSnackMessage] = React.useState("Addresss Added");
     const navigate = useNavigate();
+
+    const handleSnackClick = () => {
+        setOpen(true);
+    };
+
+    const handleSnackClose = (event, reason) => {
+        if (reason === 'clickaway') {
+        return;
+        }
+
+        setOpen(false);
+    };
+
+
+    function openProductModal(id) {
+        setAddProductModal(true);
+        setId(id)
+    }
+
+    function closeProductModal() {
+        setAddProductModal(false);
+    }
+
+    function openDeleteProductModal(id) {
+        setDeleteProductModal(true);
+        setId(id);
+    }
+
+    function closeDeleteProductModal() {
+        setDeleteProductModal(false);
+    }
 
     const selectHandleChange = (event) => {
         let newSort = event.target.value;
@@ -36,7 +94,6 @@ export default function Products(props) {
 
                 xhrProduct.addEventListener("readystatechange", function() {
                     if (this.readyState === 4) {
-                        console.log(this.responseText);
 
                         let data = JSON.parse(this.responseText);
 
@@ -53,7 +110,6 @@ export default function Products(props) {
 
                 xhrProduct.addEventListener("readystatechange", function() {
                     if (this.readyState === 4) {
-                        console.log(this.responseText);
 
                         let data = JSON.parse(this.responseText);
 
@@ -75,7 +131,6 @@ export default function Products(props) {
 
                 xhrProduct.addEventListener("readystatechange", function() {
                     if (this.readyState === 4) {
-                        console.log(this.responseText);
 
                         let data = JSON.parse(this.responseText);
 
@@ -92,7 +147,6 @@ export default function Products(props) {
 
                 xhrProduct.addEventListener("readystatechange", function() {
                     if (this.readyState === 4) {
-                        console.log(this.responseText);
 
                         let data = JSON.parse(this.responseText);
 
@@ -114,7 +168,6 @@ export default function Products(props) {
 
                 xhrProduct.addEventListener("readystatechange", function() {
                     if (this.readyState === 4) {
-                        console.log(this.responseText);
 
                         let data = JSON.parse(this.responseText);
 
@@ -131,7 +184,6 @@ export default function Products(props) {
 
                 xhrProduct.addEventListener("readystatechange", function() {
                     if (this.readyState === 4) {
-                        console.log(this.responseText);
 
                         let data = JSON.parse(this.responseText);
 
@@ -156,7 +208,6 @@ export default function Products(props) {
 
             xhrProduct.addEventListener("readystatechange", function() {
                 if (this.readyState === 4) {
-                    console.log(this.responseText);
 
                     let data = JSON.parse(this.responseText);
 
@@ -173,7 +224,6 @@ export default function Products(props) {
 
             xhrProduct.addEventListener("readystatechange", function() {
                 if (this.readyState === 4) {
-                    console.log(this.responseText);
 
                     let data = JSON.parse(this.responseText);
 
@@ -193,7 +243,6 @@ export default function Products(props) {
     };
 
     function onCLickBuyHandler (id) {
-        console.log(id);
         navigate(`/details?id=${id}`)
     }
 
@@ -202,7 +251,6 @@ export default function Products(props) {
 
         xhrCategory.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-                console.log(this.responseText);
 
                 let data = JSON.parse(this.responseText);
 
@@ -218,7 +266,6 @@ export default function Products(props) {
 
         xhrProduct.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-                console.log(this.responseText);
 
                 let data = JSON.parse(this.responseText);
 
@@ -230,6 +277,92 @@ export default function Products(props) {
 
         xhrProduct.send();
     },[])
+
+    function onClickProductModal() {
+        let name = document.getElementById("product-name").value;
+        let category = document.getElementById("product-category").value;
+        let manufacturer = document.getElementById("product-manufacturer").value;
+        let available = document.getElementById("product-available").value;
+        let price = document.getElementById("product-price").value;
+        let image = document.getElementById("product-image").value;
+        let description = document.getElementById("product-description").value;
+
+        if (name === "" || category === "" || manufacturer === "" || available === "" || price === "" || image === "" || description === "") {
+            alert("Please enter all the field");
+            return;
+        }
+
+        let xhr = new XMLHttpRequest();
+
+        let productsObj = JSON.stringify({
+            "name": name,
+            "availableItems": available,
+            "price": price,
+            "category": category,
+            "description": description,
+            "imageURL": image,
+            "manufacturer": manufacturer
+        })
+
+        xhr.addEventListener("readystatechange", function() {
+            if (this.readyState === 4) {
+
+                let responseObj = JSON.parse(this.responseText);
+
+                if (responseObj.status === "success") {
+                    setSnackSeverity("success");
+                    setSnackMessage(`Product ${name} Updated Successfully`);
+                    handleSnackClick();
+                    alert(`Product ${name} Updated Successfully`)
+                    closeProductModal();
+                    navigate('/');
+                    navigate('/products');
+                }
+                else {
+                    alert("Invalid Product Details!")
+                }
+            }
+        });
+
+        xhr.open("PUT", props.baseURL + `products/${id}`);
+
+        xhr.setRequestHeader("x-access-token", sessionStorage.getItem("token"));
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+
+        xhr.send(productsObj);
+    }
+
+    function onClickDeleteProductModal() {
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.addEventListener("readystatechange", function() {
+            if (this.readyState === 4) {
+
+                let responseObj = JSON.parse(this.responseText);
+
+                if (responseObj.status === "success") {
+                    setSnackSeverity("success");
+                    setSnackMessage("Product Deleted Successfully");
+                    handleSnackClick();
+                    alert("Product Deleted Successfully")
+                    closeDeleteProductModal();
+                    navigate('/');
+                    navigate('/products');
+                }
+                else {
+                    alert("Delete Unsuccessfull")
+                }
+            }
+        });
+
+        xhr.open("DELETE", props.baseURL + `products/${id}`);
+
+        xhr.setRequestHeader("x-access-token", sessionStorage.getItem("token"));
+
+        xhr.send();
+    }
 
     return (
         <div>
@@ -305,7 +438,7 @@ export default function Products(props) {
                                             <Button variant="contained" color="primary" id="buy-btn" onClick={() => {onCLickBuyHandler(product._id)}}>Buy</Button>
                                         </div>
                                         <div>
-                                            <EditIcon id="edit-btn"/> <DeleteIcon id="delete-btn"/>
+                                            <EditIcon id="edit-btn" onClick={() => {openProductModal(product._id)}}/> <DeleteIcon id="delete-btn" onClick={() => {openDeleteProductModal(product._id)}}/>
                                         </div>
                                     </div>
                                     
@@ -316,11 +449,96 @@ export default function Products(props) {
                         </Card>
                     ))
                 }
-                    
+
+                <Modal
+                    isOpen={addProductModal}
+                    onRequestClose={closeProductModal}
+                    style={customStyles}
+                    contentLabel="Product Modal"
+                    id="product-modal"
+                >
+
+                    <Typography
+                        variant="h5"
+                        noWrap
+                        component="div"
+                        sx={{ display: { xs: 'none', sm: 'block' } }}
+                    >
+                        Modify Product
+                    </Typography>
+
+                    <FormControl required={true} className="add-product-modal-form">
+                        <TextField id="product-name" label="Name" variant="outlined" type="text"/>
+                    </FormControl> <br/> <br/>
+
+                    <FormControl required={true} className="add-product-modal-form">
+                        <TextField id="product-category" label="Category" variant="outlined" type="text"/>
+                    </FormControl> <br/> <br/>
+
+                    <FormControl required={true} className="add-product-modal-form">
+                        <TextField id="product-manufacturer" label="Manufacturer" variant="outlined" type="text"/>
+                    </FormControl> <br/> <br/>
+
+                    <FormControl required={true} className="add-product-modal-form">
+                        <TextField id="product-available" label="Available Items" variant="outlined" type="number"/>
+                    </FormControl> <br/> <br/>
+
+                    <FormControl required={true} className="add-product-modal-form">
+                        <TextField id="product-price" label="Price" variant="outlined" type="number"/>
+                    </FormControl> <br/> <br/>
+
+                    <FormControl required={true} className="add-product-modal-form">
+                        <TextField id="product-image" label="Image URL" variant="outlined" type="text"/>
+                    </FormControl> <br/> <br/>
+
+                    <FormControl required={true} className="add-product-modal-form">
+                        <TextField id="product-description" label="Product Description" variant="outlined" type="text"/>
+                    </FormControl> <br/> <br/>
+
+                    <Button variant="contained" color="primary" id="modal-product-btn" onClick={onClickProductModal}>Modify Product</Button>
+
+                </Modal>
+
+                <Modal
+                    isOpen={deleteProductModal}
+                    onRequestClose={closeDeleteProductModal}
+                    style={customStyles}
+                    contentLabel="Product Modal"
+                    id="product-modal"
+                >
+
+                    <Typography
+                        variant="h5"
+                        noWrap
+                        component="div"
+                        sx={{ display: { xs: 'none', sm: 'block' } }}
+                    >
+                        Confirm Deletion Of Product
+                    </Typography> <br/> <br/>
+
+                    <Typography
+                        variant="body2"
+                        noWrap
+                        component="div"
+                        sx={{ display: { xs: 'none', sm: 'block' } }}
+                    >
+                        Are you sure you want to delete the product?
+                    </Typography> <br/> <br/>
+
+                    <Button variant="contained" color="primary" id="modal-product-btn" onClick={onClickDeleteProductModal}>Delete</Button>
+                    <Button id="modal-product-btn" onClick={closeDeleteProductModal}>Cancel</Button>
+
+                </Modal>
+                <Snackbar open={open} autoHideDuration={6000} onClose={handleSnackClose}>
+                    <Alert onClose={handleSnackClose} severity={snackSverity} sx={{ width: '100%' }}>
+                        {snackMessage}
+                    </Alert>
+                </Snackbar>
                 </div>
                 
             </div>   
         }
         </div>
     );
+    
 }
